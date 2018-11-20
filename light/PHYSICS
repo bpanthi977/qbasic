@@ -1,0 +1,102 @@
+TYPE coord
+x AS DOUBLE
+y AS DOUBLE
+END TYPE
+
+TYPE quad
+p1 AS coord
+p2 AS coord
+p3 AS coord
+p4 AS coord
+END TYPE
+
+TYPE medium
+quad AS quad
+speed AS SINGLE
+clr AS SINGLE
+area AS DOUBLE
+nam AS STRING * 20
+vDec AS SINGLE
+END TYPE
+
+TYPE segment
+p1 AS coord
+p2 AS coord
+END TYPE
+
+TYPE eqn
+a AS DOUBLE
+b AS DOUBLE
+c AS DOUBLE
+END TYPE
+
+CONST swidth = 600, sheight = 400
+'pi = 3.141592654#
+CONST pi = 3.141593
+
+DIM SHARED o  AS coord
+DIM SHARED inf AS coord
+o.x = swidth / 2: o.y = sheight / 2
+inf.x = 9999999: inf.y = inf.x
+
+DIM tmpQ(4) AS coord
+DIM SHARED media AS INTEGER
+media = 0
+DIM p AS coord, q AS quad
+
+        OPEN file$ FOR INPUT AS #1
+INPUT #1, media, topic$
+INPUT #1, x, y
+o.x = o.x + x: o.y = o.y + y
+INPUT #1, raysCount, velocityDecrease, drawNormals
+DIM SHARED medias(media) AS medium
+
+IF (velocityDecrease > 0) THEN
+        DO UNTIL velocityDecrease = 0
+        velocityDecrease = velocityDecrease - 1
+        INPUT #1, n, value
+        medias(n).vDec = value
+        LOOP
+END IF
+
+PRINT "Open file "; file$; " ? "
+PRINT "Topic :"; topic$
+PRINT "Rays :"; raysCount; " Media :"; media
+a$ = INPUT$(1)
+CLS
+
+
+p.x = -swidth / 2: p.y = sheight / 2: q.p1 = p
+p.x = swidth / 2: q.p2 = p
+p.y = -sheight / 2: q.p3 = p
+p.x = -swidth / 2: q.p4 = p
+medias(0).quad = q
+medias(0).speed = medias(1).speed * 100
+medias(0).nam = "Reflector"
+       
+counter = 0
+
+DO UNTIL EOF(1) OR counter >= media
+
+counter = counter + 1
+
+INPUT #1, null
+INPUT #1, n
+
+INPUT #1, medias(n).nam, medias(n).speed, medias(n).clr
+INPUT #1, medias(n).quad.p1.x, medias(n).quad.p1.y
+INPUT #1, medias(n).quad.p2.x, medias(n).quad.p2.y
+INPUT #1, medias(n).quad.p3.x, medias(n).quad.p3.y
+INPUT #1, medias(n).quad.p4.x, medias(n).quad.p4.y
+
+LOOP
+
+DIM med AS medium
+DIM medR AS medium
+DIM sray AS eqn
+DIM cpoint AS coord, npoint AS coord, tmp(4) AS coord
+DIM plane AS segment
+DIM nplane AS segment
+DIM SHARED count AS INTEGER
+DIM SHARED endCount AS INTEGER
+
